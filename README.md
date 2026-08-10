@@ -103,8 +103,28 @@ The plugin provides:
 
 - `skills/babysit/SKILL.md` as the core entrypoint
 - mode wrapper skills such as `$call`, `$plan`, and `$resume`
-- plugin-level lifecycle hooks for `SessionStart`, `UserPromptSubmit`, and
-  `Stop`
+- plugin-level lifecycle hooks for `SessionStart`, `SessionEnd`,
+  `PreToolUse`, `PostToolUse`, `UserPromptSubmit`, and `Stop`
+
+Hooks can be wired through more than one surface, and exactly one copy fires
+per event:
+
+- **Plugin bundle** — `hooks.json` commands resolve their scripts through
+  `${CLAUDE_PLUGIN_ROOT}` / `${PLUGIN_ROOT}`, which Codex sets for
+  plugin-sourced hooks (and no-op cleanly when neither is set). Used when the
+  plugin is installed through the Codex marketplace
+  (`codex plugin add babysitter`).
+- **Managed `.codex` surface** — `install --global` copies the hook scripts
+  into `<codexHome>/hooks/` (`$CODEX_HOME` or `~/.codex`) and merges
+  absolute-path entries into `<codexHome>/hooks.json`; `install --workspace`
+  does the same under `<workspace>/.codex/`. These files are machine-local —
+  teammates rerun the installer rather than committing them.
+
+Each event is claimed by the nearest live surface — a workspace surface found
+by walking up from the session cwd wins over the Codex-home surface, which
+wins over the plugin bundle. A surface counts as live only when both its
+`.babysitter-managed-surface` marker and the event's script exist, so a stale
+or half-removed install can never silently swallow events.
 
 The process library is fetched and bound through the SDK CLI in
 `~/.a5c/active/process-library.json`.
@@ -166,6 +186,32 @@ On native Windows, Codex hooks require **Codex CLI >= 0.119.0** (released
 2026-04-10, [openai/codex#17268](https://github.com/openai/codex/pull/17268)).
 Older Codex versions silently skipped hook execution on Windows. If hooks do
 not fire after install, run `codex --version` and upgrade if needed.
+
+## Troubleshooting Hooks
+
+If Babysitter hooks do not appear to run:
+
+1. **Check the hooks feature is on.** `~/.codex/config.toml` (or the workspace
+   `.codex/config.toml`) must contain `[features]` with `hooks = true`. The
+   installer merges this automatically; re-run the installer if it is missing.
+2. **Trust the hooks.** Codex gates newly discovered hooks behind a trust
+   prompt. Open the hooks browser inside Codex (`/hooks`) and approve the
+   `babysitter-proxied-*` handlers if they are listed as untrusted.
+3. **Check the SDK CLI resolves.** Hooks proxy into `babysitter` and
+   `adapters-hooks` from `@a5c-ai/babysitter-sdk`. Run
+   `command -v babysitter adapters-hooks`; if missing, run
+   `npm install -g @a5c-ai/babysitter-sdk`. When the SDK is missing the hooks
+   exit quietly (they never break your Codex session) and log a
+   `[babysitter] ... hook skipped` line to stderr.
+4. **Check the scripts exist where the config points.** For a global install:
+   `ls ~/.codex/hooks/babysitter-proxied-*.sh` and confirm the commands in
+   `~/.codex/hooks.json` use absolute paths. For a workspace install the same
+   files live under `<workspace>/.codex/`. For a marketplace install the
+   scripts live in the plugin bundle and the commands resolve via
+   `${CLAUDE_PLUGIN_ROOT}`.
+5. **Reinstall to repair.** Re-running the installer is idempotent: it
+   replaces stale managed entries (including ones from older package versions)
+   without duplicating them and without touching hooks you added yourself.
 
 ## License
 

@@ -2,66 +2,60 @@
   "hooks": {
     "SessionStart": [
       {
-        "matcher": ".*",
         "hooks": [
           {
             "type": "command",
-            "command": "adapters-hooks invoke --adapter codex --handler \"bash .codex/hooks/babysitter-proxied-session-start.sh\" --json"
+            "command": "if [ -n \"${CLAUDE_PLUGIN_ROOT:-${PLUGIN_ROOT:-}}\" ]; then exec bash \"${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}/hooks/babysitter-proxied-session-start.sh\"; fi"
           }
         ]
       }
     ],
     "Stop": [
       {
-        "matcher": ".*",
         "hooks": [
           {
             "type": "command",
-            "command": "adapters-hooks invoke --adapter codex --handler \"bash .codex/hooks/babysitter-proxied-stop.sh\" --json"
+            "command": "if [ -n \"${CLAUDE_PLUGIN_ROOT:-${PLUGIN_ROOT:-}}\" ]; then exec bash \"${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}/hooks/babysitter-proxied-stop.sh\"; fi"
           }
         ]
       }
     ],
     "UserPromptSubmit": [
       {
-        "matcher": ".*",
         "hooks": [
           {
             "type": "command",
-            "command": "adapters-hooks invoke --adapter codex --handler \"bash .codex/hooks/babysitter-proxied-user-prompt-submit.sh\" --json"
+            "command": "if [ -n \"${CLAUDE_PLUGIN_ROOT:-${PLUGIN_ROOT:-}}\" ]; then exec bash \"${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}/hooks/babysitter-proxied-user-prompt-submit.sh\"; fi"
           }
         ]
       }
     ],
     "PreToolUse": [
       {
-        "matcher": ".*",
         "hooks": [
           {
             "type": "command",
-            "command": "adapters-hooks invoke --adapter codex --handler \"bash .codex/hooks/babysitter-proxied-pre-tool-use.sh\" --json"
+            "command": "if [ -n \"${CLAUDE_PLUGIN_ROOT:-${PLUGIN_ROOT:-}}\" ]; then exec bash \"${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}/hooks/babysitter-proxied-pre-tool-use.sh\"; fi"
           }
         ]
       }
     ],
     "PostToolUse": [
       {
-        "matcher": ".*",
         "hooks": [
           {
             "type": "command",
-            "command": "adapters-hooks invoke --adapter codex --handler \"bash .codex/hooks/babysitter-proxied-post-tool-use.sh\" --json"
+            "command": "if [ -n \"${CLAUDE_PLUGIN_ROOT:-${PLUGIN_ROOT:-}}\" ]; then exec bash \"${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}/hooks/babysitter-proxied-post-tool-use.sh\"; fi"
           }
         ]
       }
     ],
     "SessionEnd": [
       {
-        "matcher": ".*",
         "hooks": [
           {
             "type": "command",
-            "command": "adapters-hooks invoke --adapter codex --handler \"bash .codex/hooks/babysitter-proxied-session-end.sh\" --json"
+            "command": "if [ -n \"${CLAUDE_PLUGIN_ROOT:-${PLUGIN_ROOT:-}}\" ]; then exec bash \"${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}/hooks/babysitter-proxied-session-end.sh\"; fi"
           }
         ]
       }

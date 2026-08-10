@@ -21,6 +21,7 @@
     "hooks.json",
     "skills/",
     ".app.json",
+    "versions.json",
     "bin/",
     "scripts/",
     "plugin.lock.json",
